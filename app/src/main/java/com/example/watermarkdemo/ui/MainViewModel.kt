@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import androidx.camera.core.ImageProxy
 import androidx.lifecycle.AndroidViewModel
 import com.example.watermarkdemo.processing.EnhanceParams
+import com.example.watermarkdemo.processing.EnhanceResult
 import com.example.watermarkdemo.processing.FrameConverter
 import com.example.watermarkdemo.processing.FrameSaver
 import com.example.watermarkdemo.processing.Stage
@@ -37,6 +38,7 @@ enum class SaveStatus {
  * @property frameHeight 輸出高度（像素）
  * @property processMs 單幀處理耗時（毫秒）
  * @property fps 平滑後的處理幀率
+ * @property paperFound 是否檢測到紙面四邊形；未開啟矯正時為 null
  */
 data class MainUiState(
     val params: EnhanceParams = EnhanceParams(),
@@ -46,6 +48,7 @@ data class MainUiState(
     val frameHeight: Int = 0,
     val processMs: Long = 0L,
     val fps: Float = 0f,
+    val paperFound: Boolean? = null,
     val saveStatus: SaveStatus = SaveStatus.IDLE,
 )
 
@@ -81,9 +84,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val start = System.nanoTime()
             rgba = FrameConverter.toUprightRgba(image)
             val state = _uiState.value
-            val output = enhancer.process(rgba, state.params, state.stage)
-            val saveStatus = if (saveRequested.getAndSet(false)) saveFrames(rgba, output) else null
-            publish(output, start, saveStatus)
+            val result = enhancer.process(rgba, state.params, state.stage)
+            val saveStatus = if (saveRequested.getAndSet(false)) saveFrames(rgba, result.bitmap) else null
+            publish(result, start, saveStatus)
         } catch (e: Exception) {
             Timber.e(e, "process frame failed")
         } finally {
@@ -92,7 +95,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun publish(output: Bitmap, startNanos: Long, saveStatus: SaveStatus?) {
+    private fun publish(result: EnhanceResult, startNanos: Long, saveStatus: SaveStatus?) {
+        val output = result.bitmap
         val now = System.nanoTime()
         val interval = if (lastFrameNanos == 0L) 0L else now - lastFrameNanos
         lastFrameNanos = now
@@ -100,6 +104,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val instantFps = if (interval > 0) NANOS_PER_SECOND / interval else s.fps
             s.copy(
                 frame = output,
+                paperFound = result.paperFound,
                 frameWidth = output.width,
                 frameHeight = output.height,
                 processMs = (now - startNanos) / NANOS_PER_MILLI,

@@ -193,6 +193,14 @@ private fun ControlPanel(state: MainUiState, viewModel: MainViewModel, modifier:
         SectionTitle(R.string.section_channel)
         ChipRow(SourceChannel.entries, p.channel, { channelLabel(it) }) { c -> update { it.copy(channel = c) } }
 
+        SwitchRow(R.string.label_rectify, p.rectify) { on -> update { it.copy(rectify = on) } }
+        if (p.rectify) {
+            Text(
+                text = stringResource(paperText(state.paperFound)),
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+
         SwitchRow(R.string.label_flat_field, p.flatField) { on -> update { it.copy(flatField = on) } }
         if (p.flatField) {
             ParamSlider(R.string.label_flat_sigma, p.flatFieldSigma, SIGMA_MIN..SIGMA_MAX) { v ->
@@ -290,8 +298,16 @@ private fun ParamSlider(
     }
 }
 
+private fun paperText(found: Boolean?): Int = when (found) {
+    true -> R.string.paper_found
+    false -> R.string.paper_not_found
+    null -> R.string.paper_unknown
+}
+
 private fun stageLabel(stage: Stage): Int = when (stage) {
     Stage.SOURCE -> R.string.stage_source
+    Stage.DETECT -> R.string.stage_detect
+    Stage.RECTIFY -> R.string.stage_rectify
     Stage.FLAT_FIELD -> R.string.stage_flat_field
     Stage.HIGH_PASS -> R.string.stage_high_pass
     Stage.CURVE -> R.string.stage_curve

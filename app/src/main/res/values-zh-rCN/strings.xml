@@ -14,6 +14,12 @@
     <string name="section_curve">逐像素曲线</string>
 
     <string name="stage_source">通道</string>
+    <string name="stage_detect">检测</string>
+    <string name="stage_rectify">矫正</string>
+    <string name="label_rectify">纸面检测 + 透视矫正</string>
+    <string name="paper_found">已检测到纸面四边形</string>
+    <string name="paper_not_found">未检测到纸面四边形，使用整幅画面</string>
+    <string name="paper_unknown">等待第一帧…</string>
     <string name="stage_flat_field">光照归一化</string>
     <string name="stage_high_pass">高通</string>
     <string name="stage_curve">曲线</string>

@@ -13,9 +13,17 @@ import org.opencv.core.Size
 import org.opencv.imgproc.Imgproc
 
 /**
+ * 一次處理的結果。
+ *
+ * @property bitmap 指定階段的輸出，呼叫端擁有所有權
+ * @property paperFound 是否檢測到紙面四邊形；未開啟矯正時為 null
+ */
+class EnhanceResult(val bitmap: Bitmap, val paperFound: Boolean?)
+
+/**
  * 複現 libYellowWatermark.so 的「一級水印」增強管線（由反編譯結果推斷，非逐位元一致）。
  *
- * 順序：取通道 -> (光照歸一化) -> 3x3 卷積 -> 腐蝕x N -> 膨脹x N -> 曲線 -> 直方圖均衡 -> 分位拉伸。
+ * 順序：取通道 -> (紙面檢測 + 透視矯正) -> (光照歸一化) -> 3x3 卷積 -> 腐蝕x N -> 膨脹x N -> 曲線 -> 直方圖均衡 -> 分位拉伸。
  * 非執行緒安全，由呼叫端保證同一時間只在一個執行緒使用。
  */
 class WatermarkEnhancer {
@@ -26,31 +34,40 @@ class WatermarkEnhancer {
      * @param rgba CV_8UC4、RGBA 排列、已旋轉為直立的畫面；本函式不會修改也不會釋放它
      * @param params 管線參數
      * @param upTo 要輸出的階段，後面的階段不會執行
-     * @return 8-bit 灰階圖轉成的 ARGB_8888 Bitmap，呼叫端擁有所有權
+     * @return 輸出圖與紙面檢測結果
      */
-    fun process(rgba: Mat, params: EnhanceParams, upTo: Stage): Bitmap {
+    fun process(rgba: Mat, params: EnhanceParams, upTo: Stage): EnhanceResult {
         val owned = ArrayList<Mat>()
         fun <T : Mat> T.track(): T = also { owned.add(it) }
         try {
             var cur = extractChannel(rgba, params.channel).track()
-            if (upTo == Stage.SOURCE) return cur.toBitmap()
+            if (upTo == Stage.SOURCE) return EnhanceResult(cur.toBitmap(), null)
+
+            val quad = if (params.rectify) PaperDetector.find(rgba) else null
+            val paperFound = if (params.rectify) quad != null else null
+            if (upTo == Stage.DETECT) {
+                return EnhanceResult(PaperDetector.drawOverlay(cur, quad).track().toBitmap(), paperFound)
+            }
+
+            if (quad != null) cur = PaperDetector.rectify(cur, quad).track()
+            if (upTo == Stage.RECTIFY) return EnhanceResult(cur.toBitmap(), paperFound)
 
             if (params.flatField) {
                 cur = flatField(cur, params.flatFieldSigma, params.flatFieldTarget).track()
             }
-            if (upTo == Stage.FLAT_FIELD) return cur.toBitmap()
+            if (upTo == Stage.FLAT_FIELD) return EnhanceResult(cur.toBitmap(), paperFound)
 
             cur = highPassAndMorph(cur, params).track()
-            if (upTo == Stage.HIGH_PASS) return cur.toBitmap()
+            if (upTo == Stage.HIGH_PASS) return EnhanceResult(cur.toBitmap(), paperFound)
 
             cur = applyCurve(cur, params).track()
-            if (upTo == Stage.CURVE) return cur.toBitmap()
+            if (upTo == Stage.CURVE) return EnhanceResult(cur.toBitmap(), paperFound)
 
             cur = Mat().track().also { Imgproc.equalizeHist(cur, it) }
-            if (upTo == Stage.EQUALIZE) return cur.toBitmap()
+            if (upTo == Stage.EQUALIZE) return EnhanceResult(cur.toBitmap(), paperFound)
 
             cur = percentileStretch(cur).track()
-            return cur.toBitmap()
+            return EnhanceResult(cur.toBitmap(), paperFound)
         } finally {
             owned.forEach { it.release() }
         }

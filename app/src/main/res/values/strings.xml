@@ -14,6 +14,12 @@
     <string name="section_curve">Per-pixel curve</string>
 
     <string name="stage_source">Channel</string>
+    <string name="stage_detect">Detect</string>
+    <string name="stage_rectify">Rectify</string>
+    <string name="label_rectify">Paper detect + perspective rectify</string>
+    <string name="paper_found">Paper quad found</string>
+    <string name="paper_not_found">No paper quad found, using full frame</string>
+    <string name="paper_unknown">Waiting for the first frame…</string>
     <string name="stage_flat_field">Flat field</string>
     <string name="stage_high_pass">High-pass</string>
     <string name="stage_curve">Curve</string>

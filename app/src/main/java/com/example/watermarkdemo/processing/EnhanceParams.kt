@@ -20,6 +20,8 @@ enum class CurveMode {
 /** 管線階段，用於選擇要顯示哪一階段的輸出。順序即處理順序。 */
 enum class Stage {
     SOURCE,
+    DETECT,
+    RECTIFY,
     FLAT_FIELD,
     HIGH_PASS,
     CURVE,
@@ -56,11 +58,12 @@ object EnhanceConstants {
  * 增強管線參數。
  *
  * @property channel 來源通道
+ * @property rectify 是否先檢測紙面四邊形並做透視矯正；找不到四邊形時退回整幅畫面
  * @property flatField 是否先做光照歸一化（原庫沒有此步驟，是為對比額外加的）
  * @property flatFieldSigma 光照估計的高斯 sigma，單位為原圖像素
  * @property flatFieldTarget 歸一化後紙面目標亮度，EXTRACT 曲線假設紙面大於 170
- * @property kernelCenter 3x3 卷積核中心值，其餘為十字 -1（原庫的核未確認，這裡是推斷）
- * @property morphKernelSize 腐蝕/膨脹結構元素邊長，1 等同空操作
+ * @property kernelCenter 3x3 卷積核中心值，其餘為十字 -1；原庫實際核為 [0,-1,0; -1,5,-1; 0,-1,0]（已由反編譯確認，預設 5）
+ * @property morphKernelSize 腐蝕/膨脹結構元素邊長，原庫實際為 1x1（空操作），預設與原庫一致
  * @property morphIterations 腐蝕與膨脹各自的次數
  * @property curveMode 逐像素曲線模式
  * @property curveDv USE_NEW 的分界值
@@ -69,6 +72,7 @@ object EnhanceConstants {
  */
 data class EnhanceParams(
     val channel: SourceChannel = SourceChannel.BLUE,
+    val rectify: Boolean = true,
     val flatField: Boolean = false,
     val flatFieldSigma: Float = EnhanceConstants.DEFAULT_FLAT_FIELD_SIGMA,
     val flatFieldTarget: Float = EnhanceConstants.DEFAULT_FLAT_FIELD_TARGET,
