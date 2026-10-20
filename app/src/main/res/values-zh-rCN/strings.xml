@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">水印增强 Demo</string>
+
+    <string name="permission_rationale">需要相机权限来分析印刷件上的水印。</string>
+    <string name="action_grant_camera">授予相机权限</string>
+    <string name="cd_output_frame">增强后的相机画面</string>
+    <string name="status_waiting_frame">等待第一帧…</string>
+    <string name="status_line">%1$d×%2$d · %3$.1f fps · %4$d ms</string>
+
+    <string name="section_stage">显示阶段</string>
+    <string name="section_channel">来源通道</string>
+    <string name="section_highpass">3×3 滤波 + 腐蚀 / 膨胀</string>
+    <string name="section_curve">逐像素曲线</string>
+
+    <string name="stage_source">通道</string>
+    <string name="stage_flat_field">光照归一化</string>
+    <string name="stage_high_pass">高通</string>
+    <string name="stage_curve">曲线</string>
+    <string name="stage_equalize">均衡化</string>
+    <string name="stage_stretch">拉伸</string>
+
+    <string name="channel_blue">B</string>
+    <string name="channel_green">G</string>
+    <string name="channel_red">R</string>
+    <string name="channel_luma">亮度</string>
+
+    <string name="label_flat_field">光照归一化（原库没有）</string>
+    <string name="label_flat_sigma">背景 sigma（像素）</string>
+    <string name="label_flat_target">纸面目标亮度</string>
+    <string name="label_kernel_center">卷积核中心值</string>
+    <string name="label_morph_size">腐蚀/膨胀核大小</string>
+    <string name="label_morph_iter">腐蚀/膨胀次数</string>
+
+    <string name="curve_extract">extract（150/170/235）</string>
+    <string name="curve_use_new">useNew（dv/at255/rt0）</string>
+    <string name="label_curve_dv">dv</string>
+    <string name="label_curve_at255">at255</string>
+    <string name="label_curve_rt0">rt0</string>
+
+    <string name="action_save_frame">保存原始帧 + 输出帧（PNG）</string>
+    <string name="save_idle">保存到 图片/WatermarkDemo</string>
+    <string name="save_pending">将在下一帧保存…</string>
+    <string name="save_saved">已保存到 图片/WatermarkDemo</string>
+    <string name="save_failed">保存失败，请看 logcat</string>
+</resources>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Watermark Demo</string>
+
+    <string name="permission_rationale">Camera access is required to analyse the printed watermark.</string>
+    <string name="action_grant_camera">Grant camera permission</string>
+    <string name="cd_output_frame">Enhanced camera frame</string>
+    <string name="status_waiting_frame">Waiting for the first frame…</string>
+    <string name="status_line">%1$d×%2$d · %3$.1f fps · %4$d ms</string>
+
+    <string name="section_stage">Show stage</string>
+    <string name="section_channel">Source channel</string>
+    <string name="section_highpass">3×3 filter + erode / dilate</string>
+    <string name="section_curve">Per-pixel curve</string>
+
+    <string name="stage_source">Channel</string>
+    <string name="stage_flat_field">Flat field</string>
+    <string name="stage_high_pass">High-pass</string>
+    <string name="stage_curve">Curve</string>
+    <string name="stage_equalize">Equalize</string>
+    <string name="stage_stretch">Stretch</string>
+
+    <string name="channel_blue">B</string>
+    <string name="channel_green">G</string>
+    <string name="channel_red">R</string>
+    <string name="channel_luma">Luma</string>
+
+    <string name="label_flat_field">Flat-field normalisation (not in original)</string>
+    <string name="label_flat_sigma">Background sigma (px)</string>
+    <string name="label_flat_target">Paper target level</string>
+    <string name="label_kernel_center">Kernel centre</string>
+    <string name="label_morph_size">Morph kernel size</string>
+    <string name="label_morph_iter">Morph iterations</string>
+
+    <string name="curve_extract">extract (150/170/235)</string>
+    <string name="curve_use_new">useNew (dv/at255/rt0)</string>
+    <string name="label_curve_dv">dv</string>
+    <string name="label_curve_at255">at255</string>
+    <string name="label_curve_rt0">rt0</string>
+
+    <string name="action_save_frame">Save raw + output frame (PNG)</string>
+    <string name="save_idle">Saved to Pictures/WatermarkDemo</string>
+    <string name="save_pending">Saving on next frame…</string>
+    <string name="save_saved">Saved to Pictures/WatermarkDemo</string>
+    <string name="save_failed">Save failed, see logcat</string>
+</resources>
